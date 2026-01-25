@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>H-Fin Customer Support</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Noto Sans', system-ui, -apple-system, sans-serif;
+            background: #1B1E1E;
+            color: #F2F2EB;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-header {
+            background: #F9501B;
+            padding: 16px;
+            text-align: center;
+        }
+        .chat-header h1 {
+            font-size: 20px;
+            margin: 0;
+        }
+        .user-info-form {
+            padding: 30px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 20px;
+            max-width: 500px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        .user-info-form h2 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        .user-info-form p {
+            opacity: 0.8;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .form-group label {
+            font-weight: 600;
+        }
+        .form-group input {
+            padding: 12px;
+            background: rgba(242, 242, 235, 0.08);
+            border: 1px solid rgba(242, 242, 235, 0.2);
+            border-radius: 6px;
+            color: #F2F2EB;
+            font-size: 16px;
+            font-family: inherit;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #F9501B;
+        }
+        button {
+            background: #F9501B;
+            color: #F2F2EB;
+            padding: 14px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+        button:hover {
+            opacity: 0.85;
+        }
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .chat-container {
+            display: none;
+            flex-direction: column;
+            flex: 1;
+            overflow: hidden;
+        }
+        .chat-container.active {
+            display: flex;
+        }
+        .chat-messages {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+            background: #0f1111;
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-message {
+            margin-bottom: 16px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+        .message-sender {
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            opacity: 0.7;
+        }
+        .message-bubble {
+            padding: 10px 14px;
+            border-radius: 8px;
+        }
+        .bot-message {
+            align-self: flex-start;
+        }
+        .bot-message .message-bubble {
+            background: rgba(242, 242, 235, 0.08);
+        }
+        .user-message {
+            align-self: flex-end;
+        }
+        .user-message .message-bubble {
+            background: #F9501B;
+            color: #F2F2EB;
+        }
+        .user-message .message-sender {
+            text-align: right;
+        }
+        .support-message {
+            align-self: flex-start;
+        }
+        .support-message .message-bubble {
+            background: #1E88E5;
+            color: #F2F2EB;
+        }
+        .message-bubble p {
+            margin: 0;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        .message-bubble .timestamp {
+            font-size: 11px;
+            opacity: 0.7;
+            margin-top: 4px;
+        }
+        .chat-input-container {
+            display: flex;
+            gap: 8px;
+            padding: 12px;
+            background: rgba(242, 242, 235, 0.08);
+            border-top: 1px solid rgba(242, 242, 235, 0.1);
+        }
+        .chat-input {
+            flex: 1;
+            padding: 10px 12px;
+            background: #1B1E1E;
+            border: 1px solid rgba(242, 242, 235, 0.2);
+            border-radius: 6px;
+            color: #F2F2EB;
+            font-family: inherit;
+            font-size: 14px;
+        }
+        .chat-input:focus {
+            outline: none;
+            border-color: #F9501B;
+        }
+        .send-button {
+            background: #F9501B;
+            border: none;
+            color: #F2F2EB;
+            width: 40px;
+            height: 40px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+        .send-button svg {
+            width: 20px;
+            height: 20px;
+        }
+        .attach-button {
+            background: rgba(242, 242, 235, 0.08);
+            border: 1px solid rgba(242, 242, 235, 0.2);
+            color: #F2F2EB;
+            width: 40px;
+            height: 40px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            transition: all 0.2s;
+        }
+        .attach-button:hover {
+            background: #F9501B;
+            border-color: #F9501B;
+        }
+        .attach-button svg {
+            width: 20px;
+            height: 20px;
+        }
+        .image-preview {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: 8px;
+            margin-top: 8px;
+        }
+        .message-image {
+            max-width: 100%;
+            border-radius: 8px;
+            margin-top: 8px;
+            cursor: pointer;
+        }
+        #imageInput {
+            display: none;
+        }
+        .quick-replies {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 12px 0;
+            margin-bottom: 12px;
+        }
+        .quick-reply-btn {
+            background: rgba(242, 242, 235, 0.08);
+            border: 1px solid rgba(242, 242, 235, 0.2);
+            color: #F2F2EB;
+            padding: 8px 14px;
+            border-radius: 16px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .quick-reply-btn:hover {
+            background: #F9501B;
+            border-color: #F9501B;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-header">
+        <h1>H-Fin Customer Support</h1>
+    </div>
+    
+    <div class="user-info-form" id="userInfoForm">
+        <div>
+            <h2>Welcome!</h2>
+            <p>Please provide your details to start chatting with our team.</p>
+        </div>
+        <div class="form-group">
+            <label for="userName">Your Name</label>
+            <input type="text" id="userName" required>
+        </div>
+        <div class="form-group">
+            <label for="userEmail">Your Email</label>
+            <input type="email" id="userEmail" required>
+        </div>
+        <button id="startChatBtn">Start Chat</button>
+    </div>
+    
+    <div class="chat-container" id="chatContainer">
+        <div class="chat-messages" id="chatMessages">
+            <div class="chat-message bot-message">
+                <p>Thank you for contacting H-Fin! A customer support representative will reach out to you soon. In the meantime, how can we assist you?</p>
+            </div>
+            <div class="quick-replies" id="quickReplies">
+                <button class="quick-reply-btn" data-message="I need information about loan products">Loan Products</button>
+                <button class="quick-reply-btn" data-message="What are your interest rates?">Interest Rates</button>
+                <button class="quick-reply-btn" data-message="How long does approval take?">Approval Time</button>
+                <button class="quick-reply-btn" data-message="What documents do I need?">Required Documents</button>
+            </div>
+        </div>
+        <div class="chat-input-container">
+            <input type="file" id="imageInput" accept="image/*">
+            <button id="attachButton" class="attach-button" title="Attach image">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
+                </svg>
+            </button>
+            <input type="text" id="chatInput" class="chat-input" placeholder="Type your message...">
+            <button id="sendMessage" class="send-button">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+            </button>
+        </div>
+    </div>
+    
+    <script>
+        const SUPABASE_URL = 'https://ryhopyvzareqomjamzjo.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ5aG9weXZ6YXJlcW9tamFtempvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ2NjU4OTMsImV4cCI6MjA4MDI0MTg5M30.db-AI3xivMWK5PajXWDgUvXCMr6R5RD_LuvXkBLHjN8';
+        
+        let userName = '';
+        let userEmail = '';
+        let chatId = null;
+        let pollInterval = null;
+        let selectedImage = null;
+        
+        // Check for cached user info
+        const cachedName = localStorage.getItem('hfin_chat_name');
+        const cachedEmail = localStorage.getItem('hfin_chat_email');
+        const cachedChatId = localStorage.getItem('hfin_chat_id');
+        
+        if (cachedName && cachedEmail) {
+            userName = cachedName;
+            userEmail = cachedEmail;
+            chatId = cachedChatId;
+            document.getElementById('userInfoForm').style.display = 'none';
+            document.getElementById('chatContainer').classList.add('active');
+            loadChatHistory();
+            startPolling();
+        }
+        
+        // Start chat
+        document.getElementById('startChatBtn').addEventListener('click', async () => {
+            const nameInput = document.getElementById('userName');
+            const emailInput = document.getElementById('userEmail');
+            
+            if (!nameInput.value || !emailInput.value) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            userName = nameInput.value;
+            userEmail = emailInput.value;
+            
+            // Check if admin
+            if (userName.toLowerCase() === 'admin daddy') {
+                window.location.href = './admin.html';
+                return;
+            }
+            
+            // Save to localStorage
+            localStorage.setItem('hfin_chat_name', userName);
+            localStorage.setItem('hfin_chat_email', userEmail);
+            
+            // Create or get chat record
+            try {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/loan?name=eq.${encodeURIComponent(userName)}&email=eq.${encodeURIComponent(userEmail)}`, {
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.length > 0) {
+                    chatId = data[0].id;
+                    localStorage.setItem('hfin_chat_id', chatId);
+                } else {
+                    // Create new record
+                    const createResponse = await fetch(`${SUPABASE_URL}/rest/v1/loan`, {
+                        method: 'POST',
+                        headers: {
+                            'apikey': SUPABASE_ANON_KEY,
+                            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                            'Content-Type': 'application/json',
+                            'Prefer': 'return=representation'
+                        },
+                        body: JSON.stringify({
+                            name: userName,
+                            email: userEmail,
+                            chat: []
+                        })
+                    });
+                    
+                    const newData = await createResponse.json();
+                    chatId = newData[0].id;
+                    localStorage.setItem('hfin_chat_id', chatId);
+                }
+                
+                document.getElementById('userInfoForm').style.display = 'none';
+                document.getElementById('chatContainer').classList.add('active');
+                loadChatHistory();
+                startPolling();
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Failed to connect. Please try again.');
+            }
+        });
+        
+        // Load chat history
+        async function loadChatHistory() {
+            if (!chatId) return;
+            
+            try {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/loan?id=eq.${chatId}`, {
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                    }
+                });
+                
+                const data = await response.json();
+                if (data.length > 0 && data[0].chat) {
+                    const messages = data[0].chat;
+                    const messagesContainer = document.getElementById('chatMessages');
+                    const quickReplies = document.getElementById('quickReplies');
+                    
+                    // Show welcome message and quick replies only if no messages exist
+                    if (messages.length === 0) {
+                        messagesContainer.innerHTML = '<div class="chat-message bot-message"><div class="message-sender">H-Fin Bot</div><div class="message-bubble"><p>Thank you for contacting H-Fin! A customer support representative will reach out to you soon. In the meantime, how can we assist you?</p></div></div>';
+                        if (quickReplies) quickReplies.style.display = 'flex';
+                    } else {
+                        messagesContainer.innerHTML = '';
+                        if (quickReplies) quickReplies.style.display = 'none';
+                        
+                        // Mark support messages as read
+                        let needsUpdate = false;
+                        const updatedMessages = messages.map(msg => {
+                            if (msg.sender === 'support' && !msg.read) {
+                                needsUpdate = true;
+                                return { ...msg, read: true };
+                            }
+                            return msg;
+                        });
+                        
+                        if (needsUpdate) {
+                            fetch(`${SUPABASE_URL}/rest/v1/loan?id=eq.${chatId}`, {
+                                method: 'PATCH',
+                                headers: {
+                                    'apikey': SUPABASE_ANON_KEY,
+                                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({ chat: updatedMessages })
+                            });
+                        }
+                        
+                        updatedMessages.forEach(msg => {
+                            addMessageToUI(msg.text, msg.sender, msg.timestamp, false, msg.image);
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading chat:', error);
+            }
+        }
+        
+        // Poll for new messages
+        function startPolling() {
+            pollInterval = setInterval(loadChatHistory, 3000);
+        }
+        
+        // Send message
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (!message && !selectedImage) return;
+            
+            const timestamp = new Date().toISOString();
+            
+            let imageUrl = null;
+            if (selectedImage) {
+                imageUrl = await uploadImage(selectedImage);
+            }
+            
+            addMessageToUI(message, 'user', timestamp, true, imageUrl);
+            input.value = '';
+            selectedImage = null;
+            
+            // Save to database
+            try {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/loan?id=eq.${chatId}`, {
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                    }
+                });
+                
+                const data = await response.json();
+                const currentChat = data[0].chat || [];
+                
+                currentChat.push({
+                    text: message,
+                    sender: 'user',
+                    timestamp: timestamp,
+                    read: false,
+                    image: imageUrl
+                });
+                
+                await fetch(`${SUPABASE_URL}/rest/v1/loan?id=eq.${chatId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ chat: currentChat })
+                });
+            } catch (error) {
+                console.error('Error sending message:', error);
+            }
+        }
+        
+        // Upload image to Supabase Storage
+        async function uploadImage(file) {
+            try {
+                const fileName = `${chatId}_${Date.now()}_${file.name}`;
+                const formData = new FormData();
+                formData.append('file', file);
+                
+                const response = await fetch(`${SUPABASE_URL}/storage/v1/object/chat-images/${fileName}`, {
+                    method: 'POST',
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                    },
+                    body: file
+                });
+                
+                if (response.ok) {
+                    return `${SUPABASE_URL}/storage/v1/object/public/chat-images/${fileName}`;
+                }
+                
+                // Fallback to base64 if storage fails
+                return await fileToBase64(file);
+            } catch (error) {
+                console.error('Error uploading image:', error);
+                return await fileToBase64(file);
+            }
+        }
+        
+        // Convert file to base64
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+        
+        function addMessageToUI(text, sender, timestamp, scroll = true, imageUrl = null) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            const senderClass = sender === 'user' ? 'user-message' : sender === 'support' ? 'support-message' : 'bot-message';
+            messageDiv.className = `chat-message ${senderClass}`;
+            
+            const time = timestamp ? new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+            let senderName = 'H-Fin Bot';
+            if (sender === 'user') {
+                senderName = userName || 'You';
+            } else if (sender === 'support') {
+                senderName = 'Customer Support';
+            }
+            
+            const imageHTML = imageUrl ? `<img src="${imageUrl}" class="message-image" onclick="window.open('${imageUrl}', '_blank')" alt="Attached image">` : '';
+            
+            messageDiv.innerHTML = `
+                <div class="message-sender">${senderName}</div>
+                <div class="message-bubble">
+                    ${text ? `<p>${text}</p>` : ''}
+                    ${imageHTML}
+                    ${time ? `<div class="timestamp">${time}</div>` : ''}
+                </div>
+            `;
+            
+            messagesContainer.appendChild(messageDiv);
+            if (scroll) {
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+        }
+        
+        document.getElementById('sendMessage').addEventListener('click', sendMessage);
+        document.getElementById('chatInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+        
+        // Image attachment
+        document.getElementById('attachButton').addEventListener('click', () => {
+            document.getElementById('imageInput').click();
+        });
+        
+        document.getElementById('imageInput').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file && file.type.startsWith('image/')) {
+                selectedImage = file;
+                document.getElementById('chatInput').placeholder = `📎 ${file.name} - Type message or press send`;
+            }
+        });
+        
+        // Quick reply buttons
+        document.querySelectorAll('.quick-reply-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const message = btn.dataset.message;
+                document.getElementById('chatInput').value = message;
+                sendMessage();
+                document.getElementById('quickReplies').style.display = 'none';
+            });
+        });
+        
+        // Cleanup on close
+        window.addEventListener('beforeunload', () => {
+            if (pollInterval) clearInterval(pollInterval);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>H-Fin Admin - Customer Support</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Noto Sans', system-ui, -apple-system, sans-serif;
+            background: #1B1E1E;
+            color: #F2F2EB;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .admin-header {
+            background: #F9501B;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .admin-header h1 {
+            font-size: 20px;
+            margin: 0;
+        }
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: #F2F2EB;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        .admin-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+        .users-list {
+            width: 300px;
+            background: #0f1111;
+            border-right: 1px solid rgba(242, 242, 235, 0.1);
+            overflow-y: auto;
+        }
+        .user-item {
+            padding: 16px;
+            border-bottom: 1px solid rgba(242, 242, 235, 0.1);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .user-item:hover {
+            background: rgba(242, 242, 235, 0.05);
+        }
+        .user-item.active {
+            background: rgba(249, 80, 27, 0.2);
+            border-left: 3px solid #F9501B;
+        }
+        .user-item h3 {
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+        .user-item p {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+        .user-badge {
+            display: inline-block;
+            background: #F9501B;
+            color: #F2F2EB;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-left: 8px;
+        }
+        .chat-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-info {
+            background: rgba(242, 242, 235, 0.05);
+            padding: 16px 20px;
+            border-bottom: 1px solid rgba(242, 242, 235, 0.1);
+        }
+        .chat-info h2 {
+            font-size: 18px;
+            margin-bottom: 4px;
+        }
+        .chat-info p {
+            font-size: 14px;
+            opacity: 0.7;
+        }
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #1B1E1E;
+        }
+        .empty-state {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            opacity: 0.5;
+            text-align: center;
+        }
+        .chat-message {
+            margin-bottom: 16px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            max-width: 70%;
+        }
+        .user-message {
+            background: rgba(242, 242, 235, 0.08);
+            margin-left: 0;
+            margin-right: auto;
+        }
+        .support-message {
+            background: #F9501B;
+            color: #F2F2EB;
+            margin-left: auto;
+            margin-right: 0;
+        }
+        .chat-message p {
+            margin: 0;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        .chat-message .timestamp {
+            font-size: 11px;
+            opacity: 0.7;
+            margin-top: 6px;
+        }
+        .message-image {
+            max-width: 100%;
+            border-radius: 8px;
+            margin-top: 8px;
+            cursor: pointer;
+        }
+        .chat-input-container {
+            display: flex;
+            gap: 12px;
+            padding: 16px 20px;
+            background: rgba(242, 242, 235, 0.05);
+            border-top: 1px solid rgba(242, 242, 235, 0.1);
+        }
+        .chat-input {
+            flex: 1;
+            padding: 12px 16px;
+            background: #1B1E1E;
+            border: 1px solid rgba(242, 242, 235, 0.2);
+            border-radius: 6px;
+            color: #F2F2EB;
+            font-family: inherit;
+            font-size: 14px;
+        }
+        .chat-input:focus {
+            outline: none;
+            border-color: #F9501B;
+        }
+        .send-button {
+            background: #F9501B;
+            border: none;
+            color: #F2F2EB;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .send-button:hover {
+            opacity: 0.85;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-header">
+        <h1>Customer Support Admin</h1>
+        <button class="logout-btn" id="logoutBtn">Logout</button>
+    </div>
+    
+    <div class="admin-container">
+        <div class="users-list" id="usersList">
+            <div class="empty-state">Loading users...</div>
+        </div>
+        
+        <div class="chat-panel">
+            <div class="chat-info" id="chatInfo" style="display: none;">
+                <h2 id="selectedUserName">Select a user</h2>
+                <p id="selectedUserEmail"></p>
+            </div>
+            
+            <div class="chat-messages" id="chatMessages">
+                <div class="empty-state">
+                    <p>Select a user to view their conversation</p>
+                </div>
+            </div>
+            
+            <div class="chat-input-container" style="display: none;" id="chatInputContainer">
+                <input type="text" id="chatInput" class="chat-input" placeholder="Type your response...">
+                <button id="sendMessage" class="send-button">Send</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const SUPABASE_URL = 'https://ryhopyvzareqomjamzjo.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ5aG9weXZ6YXJlcW9tamFtempvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ2NjU4OTMsImV4cCI6MjA4MDI0MTg5M30.db-AI3xivMWK5PajXWDgUvXCMr6R5RD_LuvXkBLHjN8';
+        
+        let users = [];
+        let selectedUserId = null;
+        let pollInterval = null;
+        
+        // Load users with chat
+        async function loadUsers() {
+            try {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/loan?select=*&chat=not.is.null`, {
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                    }
+                });
+                
+                users = await response.json();
+                displayUsers();
+            } catch (error) {
+                console.error('Error loading users:', error);
+            }
+        }
+        
+        function displayUsers() {
+            const usersList = document.getElementById('usersList');
+            
+            if (users.length === 0) {
+                usersList.innerHTML = '<div class="empty-state">No active chats</div>';
+                return;
+            }
+            
+            usersList.innerHTML = users.map(user => {
+                const unreadCount = user.chat ? user.chat.filter(m => m.sender === 'user' && !m.read).length : 0;
+                return `
+                    <div class="user-item" data-user-id="${user.id}">
+                        <h3>${user.name}${unreadCount > 0 ? `<span class="user-badge">${unreadCount}</span>` : ''}</h3>
+                        <p>${user.email}</p>
+                    </div>
+                `;
+            }).join('');
+            
+            document.querySelectorAll('.user-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    selectUser(parseInt(item.dataset.userId));
+                });
+            });
+        }
+        
+        function selectUser(userId) {
+            selectedUserId = userId;
+            const user = users.find(u => u.id === userId);
+            
+            if (!user) return;
+            
+            // Update UI
+            document.querySelectorAll('.user-item').forEach(item => {
+                item.classList.toggle('active', parseInt(item.dataset.userId) === userId);
+            });
+            
+            document.getElementById('chatInfo').style.display = 'block';
+            document.getElementById('selectedUserName').textContent = user.name;
+            document.getElementById('selectedUserEmail').textContent = user.email;
+            document.getElementById('chatInputContainer').style.display = 'flex';
+            
+            displayChat(user.chat || []);
+        }
+        
+        function displayChat(messages) {
+            const chatMessages = document.getElementById('chatMessages');
+            
+            if (messages.length === 0) {
+                chatMessages.innerHTML = '<div class="empty-state"><p>No messages yet</p></div>';
+                return;
+            }
+            
+            const user = users.find(u => u.id === selectedUserId);
+            
+            // Mark user messages as read
+            let needsUpdate = false;
+            const updatedMessages = messages.map(msg => {
+                if (msg.sender === 'user' && !msg.read) {
+                    needsUpdate = true;
+                    return { ...msg, read: true };
+                }
+                return msg;
+            });
+            
+            if (needsUpdate) {
+                fetch(`${SUPABASE_URL}/rest/v1/loan?id=eq.${selectedUserId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ chat: updatedMessages })
+                });
+                user.chat = updatedMessages;
+            }
+            
+            chatMessages.innerHTML = updatedMessages.map(msg => {
+                const time = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+                const className = msg.sender === 'user' ? 'user-message' : 'support-message';
+                const senderName = msg.sender === 'user' ? (user?.name || 'Customer') : 'Customer Support';
+                const imageHTML = msg.image ? `<img src="${msg.image}" class="message-image" onclick="window.open('${msg.image}', '_blank')" alt="Attached image">` : '';
+                return `
+                    <div class="chat-message ${className}">
+                        <div style="font-size: 12px; font-weight: 600; margin-bottom: 4px; opacity: 0.7;">${senderName}</div>
+                        ${msg.text ? `<p>${msg.text}</p>` : ''}
+                        ${imageHTML}
+                        ${time ? `<div class="timestamp">${time}</div>` : ''}
+                    </div>
+                `;
+            }).join('');
+            
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        async function sendMessage() {
+            if (!selectedUserId) return;
+            
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            const user = users.find(u => u.id === selectedUserId);
+            const currentChat = user.chat || [];
+            
+            currentChat.push({
+                text: message,
+                sender: 'support',
+                timestamp: new Date().toISOString(),
+                read: false
+            });
+            
+            try {
+                await fetch(`${SUPABASE_URL}/rest/v1/loan?id=eq.${selectedUserId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ chat: currentChat })
+                });
+                
+                input.value = '';
+                user.chat = currentChat;
+                displayChat(currentChat);
+            } catch (error) {
+                console.error('Error sending message:', error);
+            }
+        }
+        
+        document.getElementById('sendMessage').addEventListener('click', sendMessage);
+        document.getElementById('chatInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+        
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            localStorage.removeItem('hfin_chat_name');
+            localStorage.removeItem('hfin_chat_email');
+            localStorage.removeItem('hfin_chat_id');
+            window.close();
+        });
+        
+        // Initial load and polling
+        loadUsers();
+        pollInterval = setInterval(loadUsers, 3000);
+        
+        window.addEventListener('beforeunload', () => {
+            if (pollInterval) clearInterval(pollInterval);
+        });
+    </script>
+</body>
+</html>

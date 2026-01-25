@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>H-Fin - Loan Products</title>
+    <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo" style="font-size: 32px; font-weight: 700; letter-spacing: -1px;">
+                    H-<span style="color: var(--accent-color);">Fin</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 20px;">
+                    <a href="#apply" class="cta-button" data-i18n="getApprovedNow">Get Approved Now</a>
+                    <button id="settingsButton" class="settings-button" aria-label="Settings">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path d="M12 1v6m0 6v6m9-9h-6m-6 0H3"></path>
+                            <path d="M20.66 7l-3.46 2-3.46-2 3.46-2 3.46 2zm0 10l-3.46 2-3.46-2 3.46-2 3.46 2zM10.26 7l-3.46 2L3.34 7l3.46-2 3.46 2zm0 10l-3.46 2L3.34 17l3.46-2 3.46 2z"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="settingsPanel" class="settings-panel">
+            <div class="settings-content">
+                <h3 data-i18n="settings">Settings</h3>
+                
+                <div class="settings-group">
+                    <label data-i18n="language">Language</label>
+                    <select id="languageSelect" class="settings-select">
+                        <option value="en">English</option>
+                        <option value="af">Afrikaans</option>
+                    </select>
+                </div>
+                
+                <div class="settings-group">
+                    <label data-i18n="theme">Theme</label>
+                    <select id="themeSelect" class="settings-select">
+                        <option value="orange-dark">Black & Orange</option>
+                        <option value="orange-light">White & Orange</option>
+                        <option value="red-dark">Black & Red</option>
+                        <option value="red-light">White & Red</option>
+                        <option value="blue-dark">Black & Blue</option>
+                        <option value="blue-light">White & Blue</option>
+                        <option value="green-dark">Black & Green</option>
+                        <option value="green-light">White & Green</option>
+                        <option value="purple-dark">Black & Purple</option>
+                        <option value="purple-light">White & Purple</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section class="hero scale-in">
+        <div class="container">
+            <h1 data-i18n="heroTitle">NEED A LOAN?<br><span data-i18n="heroTitleSpan">You Have Come to the Right Place.</span></h1>
+            <p class="hero-subtitle" data-i18n="heroSubtitle">Harmonie Finansies is one of the best lending services in South Africa. We have been serving our clients for the past 8 years.</p>
+            <a href="#apply" class="cta-button" data-i18n="getStarted">Get Started</a>
+        </div>
+    </section>
+
+    <section class="about slide-right">
+        <div class="container">
+            <h2 data-i18n="aboutTitle">About <span data-i18n="us">Us</span></h2>
+            <div class="about-content slide-left">
+                <p class="about-intro" data-i18n="aboutIntro">Obtain More Financial Capital with Our Crowdfunding Network.</p>
+                <p data-i18n="aboutPara1">Whether you want to refinance debt, fund strategic growth, or execute a significant business transaction, and your requirements exceed what a single commercial bank can offer, we can help through syndicated financing.</p>
+                <p data-i18n="aboutPara2">Our approach involves collaborating with you and a crowdfunding network to raise more capital. Together, we create a personalized solution aligned with your company's goals. We are experts in leading, organizing, and managing multi-bank credit facilities.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="products scale-in">
+        <div class="container">
+            <h2 data-i18n="productsTitle">The Loan <span data-i18n="products">Products</span> We Offer</h2>
+            
+            <div class="featured-product slide-left">
+                <h3 data-i18n="termLoan">Term Loan</h3>
+                <p data-i18n="termLoanDesc">Get funding in under 24 hours for up to R18.5 million with flexible repayment terms. Terms range from six to 24 months.</p>
+                <a href="#apply" class="cta-button" data-i18n="applyNow">Apply Now</a>
+            </div>
+
+            <div class="product-grid">
+                <div class="product-card stagger-item">
+                    <h3 data-i18n="debtConsolidation">Debt Consolidation</h3>
+                    <p data-i18n="debtConsolidationDesc">Save up to 60% on what you're currently paying throughout all of your advances and credit loans while extending your term and lowering your rates. Terms range from six to 18 months.</p>
+                    <a href="#apply" class="cta-button" data-i18n="applyNow">Apply Now</a>
+                </div>
+
+                <div class="product-card stagger-item">
+                    <h3 data-i18n="bridgeLoan">Bridge/Merchant Cash Advance (MCA) Loan</h3>
+                    <p data-i18n="bridgeLoanDesc">Gain a quick advance of working capital—up to R9.25 million—to boost your profit margins and increase cash flow to meet any other business needs. Terms range up to nine months.</p>
+                    <a href="#apply" class="cta-button" data-i18n="applyNow">Apply Now</a>
+                </div>
+
+                <div class="product-card stagger-item">
+                    <h3 data-i18n="lineOfCredit">Revolving Line of Credit</h3>
+                    <p data-i18n="lineOfCreditDesc">Only pay for what you pull—apply for fast credit approvals of up to R4.6 million. Businesses must operate for over three years and have a minimum revenue of R925,000 per month. Terms range up to 24 months.</p>
+                    <a href="#apply" class="cta-button" data-i18n="applyNow">Apply Now</a>
+                </div>
+
+                <div class="product-card stagger-item">
+                    <h3 data-i18n="personalLoan">Personal Loan</h3>
+                    <p data-i18n="personalLoanDesc">Secure funding for personal needs with flexible repayment options. Get up to R500,000 with competitive interest rates. Terms range from 12 to 60 months based on your credit profile.</p>
+                    <a href="#apply" class="cta-button" data-i18n="applyNow">Apply Now</a>
+                </div>
+
+                <div class="product-card stagger-item">
+                    <h3 data-i18n="dayToDayLoan">Day to Day Loan</h3>
+                    <p data-i18n="dayToDayLoanDesc">Quick access to short-term cash for daily expenses and emergencies. Borrow up to R50,000 with rapid approval and disbursement. Terms range from 1 to 6 months.</p>
+                    <a href="#apply" class="cta-button" data-i18n="applyNow">Apply Now</a>
+                </div>
+
+                <div class="product-card stagger-item">
+                    <h3 data-i18n="propertyLoan">Property Loan</h3>
+                    <p data-i18n="propertyLoanDesc">Finance your property purchase or refinance existing property debt. Get up to R10 million for residential or commercial properties. Terms range from 10 to 30 years with competitive rates.</p>
+                    <a href="#apply" class="cta-button" data-i18n="applyNow">Apply Now</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="comparison scale-in">
+        <div class="container">
+            <h2 data-i18n="differenceTitle">The H-Fin <span data-i18n="difference">Difference</span></h2>
+            <p style="text-align: center; margin-bottom: 40px; opacity: 0.8;" data-i18n="differenceSubtitle">See how H-Fin's product loans compare to the traditional advances that banks offer.</p>
+            
+            <div class="comparison-grid">
+                <div class="comparison-card slide-left">
+                    <h3 data-i18n="withBanks">With Banks</h3>
+                    <ul class="comparison-list">
+                        <li data-i18n="bank1">700 FICO® minimum</li>
+                        <li data-i18n="bank2">30–60 days to pull funds</li>
+                        <li data-i18n="bank3">5+ years in business required</li>
+                        <li data-i18n="bank4">90 days to process application</li>
+                        <li data-i18n="bank5">Copy and paste financing solutions</li>
+                        <li data-i18n="bank6">2 years' positive cash flow tax returns required</li>
+                        <li data-i18n="bank7">Affects business credit score</li>
+                        <li data-i18n="bank8">Longer repayment schedule</li>
+                    </ul>
+                </div>
+
+                <div class="comparison-card highlight slide-right">
+                    <h3 data-i18n="withHFin">With H-Fin</h3>
+                    <ul class="comparison-list">
+                        <li data-i18n="hfin1">550 FICO® minimum</li>
+                        <li data-i18n="hfin2">1 day to access capital</li>
+                        <li data-i18n="hfin3">1+ years in business required</li>
+                        <li data-i18n="hfin4">1 day to process application</li>
+                        <li data-i18n="hfin5">Tailor-made financing solutions</li>
+                        <li data-i18n="hfin6">No tax returns required</li>
+                        <li data-i18n="hfin7">Does not affect business or personal credit score</li>
+                        <li data-i18n="hfin8">Shorter repayment schedule</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="process scale-in">
+        <div class="container">
+            <h2 data-i18n="processTitle">How It <span data-i18n="works">Works</span></h2>
+            <p style="text-align: center; margin-bottom: 50px; opacity: 0.8;" data-i18n="processSubtitle">Get your loan in just 3 simple steps</p>
+            
+            <div class="process-grid">
+                <div class="process-step stagger-item">
+                    <div class="step-number">1</div>
+                    <h3 data-i18n="step1Title">Fill Out the Application Form</h3>
+                    <p data-i18n="step1Desc">Go to our website and use the online form. It only takes 5 minutes to complete.</p>
+                </div>
+
+                <div class="process-step stagger-item">
+                    <div class="step-number">2</div>
+                    <h3 data-i18n="step2Title">Upload Documents</h3>
+                    <p data-i18n="step2Desc">We need 3 months of bank statements, a payslip, and a copy of your ID for background checks.</p>
+                </div>
+
+                <div class="process-step stagger-item">
+                    <div class="step-number">3</div>
+                    <h3 data-i18n="step3Title">Get Your Cash</h3>
+                    <p data-i18n="step3Desc">Once processed, we'll call you to confirm bank details and send the cash directly to your account.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="contact slide-right" id="apply">
+        <div class="container">
+            <h2 data-i18n="contactTitle">Request a <span data-i18n="callback">Callback</span></h2>
+            <p style="text-align: center; margin-bottom: 40px; opacity: 0.8;" data-i18n="contactSubtitle">Fill out the form below and we'll get back to you within 24 hours</p>
+            
+            <form class="contact-form scale-in">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="firstName" data-i18n="firstName">First Name</label>
+                        <input type="text" id="firstName" name="firstName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="lastName" data-i18n="lastName">Last Name</label>
+                        <input type="text" id="lastName" name="lastName" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="email" data-i18n="email">Email</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone" data-i18n="phone">Phone Number</label>
+                        <input type="tel" id="phone" name="phone" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="message" data-i18n="messageLabel">Tell us a bit about yourself</label>
+                    <textarea id="message" name="message" rows="5" required></textarea>
+                </div>
+
+                <button type="submit" class="cta-button" data-i18n="sendMessage">Send Your Message</button>
+            </form>
+        </div>
+    </section>
+
+    <section class="faq scale-in">
+        <div class="container">
+            <h2 data-i18n="faqTitle">Any <span data-i18n="questions">Questions</span>?</h2>
+            
+            <div class="faq-grid">
+                <div class="faq-item stagger-item">
+                    <div class="faq-question">
+                        <span data-i18n="faq1Q">What products does H-Fin offer?</span>
+                        <span class="faq-toggle">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p data-i18n="faq1A">H-Fin offers term loans, lines of credit, debt consolidation products, and bridge/MCA loans.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item stagger-item">
+                    <div class="faq-question">
+                        <span data-i18n="faq2Q">What is the maximum funding amount?</span>
+                        <span class="faq-toggle">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p data-i18n="faq2A">H-Fin can fund your business up to R18.5 million per contract.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item stagger-item">
+                    <div class="faq-question">
+                        <span data-i18n="faq3Q">How long are your terms?</span>
+                        <span class="faq-toggle">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p data-i18n="faq3A">Term ranges depend on what you qualify for, but they can last from six to 24 months.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item stagger-item">
+                    <div class="faq-question">
+                        <span data-i18n="faq4Q">How do I qualify?</span>
+                        <span class="faq-toggle">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p data-i18n="faq4A">Base level qualification requirements include: A 550+ FICO® score, your last three months' bank statements, over one year of being in business, and R370,000 minimum of monthly revenue.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item stagger-item">
+                    <div class="faq-question">
+                        <span data-i18n="faq5Q">How quickly can I receive funding?</span>
+                        <span class="faq-toggle">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p data-i18n="faq5A">You can receive your funds as soon as you accept your deal. This means you could get your funds the same day you apply.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item stagger-item">
+                    <div class="faq-question">
+                        <span data-i18n="faq6Q">Does H-Fin pull hard or soft inquiries?</span>
+                        <span class="faq-toggle">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p data-i18n="faq6A">H-Fin pulls soft inquiries only.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Chat Widget -->
+    <div id="chatWidget" class="chat-widget">
+        <button id="chatButton" class="chat-button" aria-label="Chat with us">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+            <span id="chatNotification" class="chat-notification" style="display: none;"></span>
+        </button>
+        <span class="chat-label" data-i18n="chatWithUs">Chat with us</span>
+    </div>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <h3 style="margin-bottom: 20px;" data-i18n="termsTitle">Terms & <span style="color: var(--accent-color);" data-i18n="conditions">Conditions</span></h3>
+                <div class="terms">
+                    <p data-i18n="term1">• Loans are subject to availability and approval.</p>
+                    <p data-i18n="term2">• Interest rates are based on individual credit scoring.</p>
+                    <p data-i18n="term3">• Loan Limits: From R50,000 to R80,000,000</p>
+                    <p data-i18n="term4">• Interest Rates: 2% to 10% per year</p>
+                    <p data-i18n="term5">• Registration: Registered under FSP593769</p>
+                </div>
+                <p style="margin-top: 30px; opacity: 0.6;" data-i18n="copyright">© 2026 H-Fin. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="./app.js"></script>
+</body>
+</html>
