@@ -150,6 +150,39 @@
             opacity: 0.7;
             margin-top: 4px;
         }
+        .message-status {
+            font-size: 11px;
+            opacity: 0.6;
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .message-status.sending {
+            color: #FFA726;
+        }
+        .message-status.sent {
+            color: #66BB6A;
+        }
+        .message-status.delivered {
+            color: #42A5F5;
+        }
+        .message-status.failed {
+            color: #EF5350;
+        }
+        .retry-btn {
+            background: #EF5350;
+            border: none;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 10px;
+            cursor: pointer;
+            margin-left: 4px;
+        }
+        .retry-btn:hover {
+            opacity: 0.8;
+        }
         .chat-input-container {
             display: flex;
             gap: 8px;
@@ -246,6 +279,59 @@
             background: #F9501B;
             border-color: #F9501B;
         }
+        .faq-toggle-btn {
+            background: rgba(242, 242, 235, 0.08);
+            border: 1px solid rgba(242, 242, 235, 0.2);
+            color: #F2F2EB;
+            padding: 10px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            margin: 12px 16px;
+            width: calc(100% - 32px);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.2s;
+        }
+        .faq-toggle-btn:hover {
+            background: rgba(242, 242, 235, 0.12);
+        }
+        .faq-section {
+            padding: 0 16px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        .faq-section.active {
+            max-height: 500px;
+            overflow-y: auto;
+            padding-bottom: 12px;
+        }
+        .faq-question-btn {
+            background: rgba(242, 242, 235, 0.08);
+            border: 1px solid rgba(242, 242, 235, 0.15);
+            color: #F2F2EB;
+            padding: 12px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            width: 100%;
+            text-align: left;
+            margin-bottom: 8px;
+            transition: all 0.2s;
+            display: block;
+        }
+        .faq-question-btn:hover {
+            background: #F9501B;
+            border-color: #F9501B;
+        }
+        .arrow-icon {
+            transition: transform 0.3s;
+        }
+        .arrow-icon.rotated {
+            transform: rotate(180deg);
+        }
     </style>
 </head>
 <body>
@@ -270,6 +356,11 @@
     </div>
     
     <div class="chat-container" id="chatContainer">
+        <button class="faq-toggle-btn" id="faqToggleBtn">
+            <span id="faqToggleText">Common Questions</span>
+            <span class="arrow-icon" id="arrowIcon">▼</span>
+        </button>
+        <div class="faq-section" id="faqSection"></div>
         <div class="chat-messages" id="chatMessages">
             <div class="chat-message bot-message">
                 <p>Thank you for contacting H-Fin! A customer support representative will reach out to you soon. In the meantime, how can we assist you?</p>
@@ -302,11 +393,43 @@
         const SUPABASE_URL = 'https://ryhopyvzareqomjamzjo.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ5aG9weXZ6YXJlcW9tamFtempvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ2NjU4OTMsImV4cCI6MjA4MDI0MTg5M30.db-AI3xivMWK5PajXWDgUvXCMr6R5RD_LuvXkBLHjN8';
         
+        const faqTranslations = {
+            en: {
+                toggleText: 'Common Questions',
+                questions: [
+                    'What products does H-Fin offer?',
+                    'What is the maximum funding amount?',
+                    'How long are your terms?',
+                    'How do I qualify?',
+                    'How quickly can I receive funding?',
+                    'What documents do I need?',
+                    'What are your interest rates?',
+                    'Do you affect credit scores?'
+                ]
+            },
+            af: {
+                toggleText: 'Algemene Vrae',
+                questions: [
+                    'Watter produkte bied H-Fin aan?',
+                    'Wat is die maksimum befondsingsberag?',
+                    'Hoe lank is julle terme?',
+                    'Hoe kwalifiseer ek?',
+                    'Hoe vinnig kan ek befondsing ontvang?',
+                    'Watter dokumente benodig ek?',
+                    'Wat is julle rentekoerse?',
+                    'Beïnvloed julle kredietpunte?'
+                ]
+            }
+        };
+        
+        let currentLanguage = localStorage.getItem('hfin_language') || 'en';
         let userName = '';
         let userEmail = '';
         let chatId = null;
         let pollInterval = null;
         let selectedImage = null;
+        let pendingMessages = [];
+        let messageIdCounter = 0;
         
         // Check for cached user info
         const cachedName = localStorage.getItem('hfin_chat_name');
@@ -441,7 +564,8 @@
                         }
                         
                         updatedMessages.forEach(msg => {
-                            addMessageToUI(msg.text, msg.sender, msg.timestamp, false, msg.image);
+                            const status = msg.sender === 'user' ? (msg.read ? 'delivered' : 'sent') : null;
+                            addMessageToUI(msg.text, msg.sender, msg.timestamp, false, msg.image, status);
                         });
                     }
                 }
@@ -463,18 +587,39 @@
             if (!message && !selectedImage) return;
             
             const timestamp = new Date().toISOString();
+            const tempId = `temp_${messageIdCounter++}`;
             
-            let imageUrl = null;
-            if (selectedImage) {
-                imageUrl = await uploadImage(selectedImage);
-            }
-            
-            addMessageToUI(message, 'user', timestamp, true, imageUrl);
+            // Add message to UI with "sending" status
+            const messageDiv = addMessageToUI(message, 'user', timestamp, true, null, 'sending', tempId);
             input.value = '';
-            selectedImage = null;
             
-            // Save to database
+            // Store pending message info
+            const pendingMessage = {
+                tempId,
+                text: message,
+                image: selectedImage,
+                timestamp
+            };
+            pendingMessages.push(pendingMessage);
+            
             try {
+                let imageUrl = null;
+                if (selectedImage) {
+                    imageUrl = await uploadImage(selectedImage);
+                }
+                
+                // Update UI with uploaded image if any
+                if (imageUrl && messageDiv) {
+                    const bubble = messageDiv.querySelector('.message-bubble');
+                    const existingContent = bubble.querySelector('p');
+                    if (existingContent) {
+                        existingContent.insertAdjacentHTML('afterend', `<img src="${imageUrl}" class="message-image" onclick="window.open('${imageUrl}', '_blank')" alt="Attached image">`);
+                    }
+                }
+                
+                selectedImage = null;
+                
+                // Save to database
                 const response = await fetch(`${SUPABASE_URL}/rest/v1/loan?id=eq.${chatId}`, {
                     headers: {
                         'apikey': SUPABASE_ANON_KEY,
@@ -502,10 +647,90 @@
                     },
                     body: JSON.stringify({ chat: currentChat })
                 });
+                
+                // Update status to "sent"
+                updateMessageStatus(tempId, 'sent');
+                pendingMessages = pendingMessages.filter(m => m.tempId !== tempId);
+                
             } catch (error) {
                 console.error('Error sending message:', error);
+                updateMessageStatus(tempId, 'failed');
             }
         }
+        
+        function updateMessageStatus(tempId, status) {
+            const messageDiv = document.querySelector(`[data-temp-id="${tempId}"]`);
+            if (messageDiv) {
+                const statusDiv = messageDiv.querySelector('.message-status');
+                if (statusDiv) {
+                    const statusIcons = {
+                        sending: '⏳',
+                        sent: '✓',
+                        delivered: '✓✓',
+                        failed: '✗'
+                    };
+                    const statusText = {
+                        sending: 'Sending...',
+                        sent: 'Sent',
+                        delivered: 'Delivered',
+                        failed: 'Failed'
+                    };
+                    statusDiv.className = `message-status ${status}`;
+                    statusDiv.innerHTML = `${statusIcons[status]} ${statusText[status]}${status === 'failed' ? `<button class="retry-btn" onclick="retryMessage('${tempId}')">Retry</button>` : ''}`;
+                }
+            }
+        }
+        
+        async function retryMessage(tempId) {
+            const pending = pendingMessages.find(m => m.tempId === tempId);
+            if (!pending) return;
+            
+            updateMessageStatus(tempId, 'sending');
+            
+            try {
+                let imageUrl = null;
+                if (pending.image) {
+                    imageUrl = await uploadImage(pending.image);
+                }
+                
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/loan?id=eq.${chatId}`, {
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                    }
+                });
+                
+                const data = await response.json();
+                const currentChat = data[0].chat || [];
+                
+                currentChat.push({
+                    text: pending.text,
+                    sender: 'user',
+                    timestamp: pending.timestamp,
+                    read: false,
+                    image: imageUrl
+                });
+                
+                await fetch(`${SUPABASE_URL}/rest/v1/loan?id=eq.${chatId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ chat: currentChat })
+                });
+                
+                updateMessageStatus(tempId, 'sent');
+                pendingMessages = pendingMessages.filter(m => m.tempId !== tempId);
+                
+            } catch (error) {
+                console.error('Error retrying message:', error);
+                updateMessageStatus(tempId, 'failed');
+            }
+        }
+        
+        window.retryMessage = retryMessage;
         
         // Upload image to Supabase Storage
         async function uploadImage(file) {
@@ -545,11 +770,14 @@
             });
         }
         
-        function addMessageToUI(text, sender, timestamp, scroll = true, imageUrl = null) {
+        function addMessageToUI(text, sender, timestamp, scroll = true, imageUrl = null, status = null, tempId = null) {
             const messagesContainer = document.getElementById('chatMessages');
             const messageDiv = document.createElement('div');
             const senderClass = sender === 'user' ? 'user-message' : sender === 'support' ? 'support-message' : 'bot-message';
             messageDiv.className = `chat-message ${senderClass}`;
+            if (tempId) {
+                messageDiv.dataset.tempId = tempId;
+            }
             
             const time = timestamp ? new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
             let senderName = 'H-Fin Bot';
@@ -561,12 +789,33 @@
             
             const imageHTML = imageUrl ? `<img src="${imageUrl}" class="message-image" onclick="window.open('${imageUrl}', '_blank')" alt="Attached image">` : '';
             
+            let statusHTML = '';
+            if (status && sender === 'user') {
+                const statusIcons = {
+                    sending: '⏳',
+                    sent: '✓',
+                    delivered: '✓✓',
+                    failed: '✗'
+                };
+                const statusText = {
+                    sending: 'Sending...',
+                    sent: 'Sent',
+                    delivered: 'Delivered',
+                    failed: 'Failed'
+                };
+                statusHTML = `<div class="message-status ${status}">
+                    ${statusIcons[status]} ${statusText[status]}
+                    ${status === 'failed' ? `<button class="retry-btn" onclick="retryMessage('${tempId}')">Retry</button>` : ''}
+                </div>`;
+            }
+            
             messageDiv.innerHTML = `
                 <div class="message-sender">${senderName}</div>
                 <div class="message-bubble">
                     ${text ? `<p>${text}</p>` : ''}
                     ${imageHTML}
                     ${time ? `<div class="timestamp">${time}</div>` : ''}
+                    ${statusHTML}
                 </div>
             `;
             
@@ -574,6 +823,8 @@
             if (scroll) {
                 messagesContainer.scrollTop = messagesContainer.scrollHeight;
             }
+            
+            return messageDiv;
         }
         
         document.getElementById('sendMessage').addEventListener('click', sendMessage);
@@ -603,6 +854,43 @@
                 document.getElementById('quickReplies').style.display = 'none';
             });
         });
+        
+        // FAQ Toggle
+        function updateFAQLanguage() {
+            const faqData = faqTranslations[currentLanguage];
+            document.getElementById('faqToggleText').textContent = faqData.toggleText;
+            
+            const faqSection = document.getElementById('faqSection');
+            faqSection.innerHTML = faqData.questions.map(q => 
+                `<button class="faq-question-btn" onclick="selectFAQ('${q.replace(/'/g, "\\'")}')">${q}</button>`
+            ).join('');
+        }
+        
+        document.getElementById('faqToggleBtn').addEventListener('click', () => {
+            const faqSection = document.getElementById('faqSection');
+            const arrow = document.getElementById('arrowIcon');
+            faqSection.classList.toggle('active');
+            arrow.classList.toggle('rotated');
+        });
+        
+        function selectFAQ(question) {
+            document.getElementById('chatInput').value = question;
+            document.getElementById('faqSection').classList.remove('active');
+            document.getElementById('arrowIcon').classList.remove('rotated');
+        }
+        
+        window.selectFAQ = selectFAQ;
+        
+        // Listen for language changes from main page
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'hfin_language') {
+                currentLanguage = e.newValue || 'en';
+                updateFAQLanguage();
+            }
+        });
+        
+        // Initialize FAQ
+        updateFAQLanguage();
         
         // Cleanup on close
         window.addEventListener('beforeunload', () => {
