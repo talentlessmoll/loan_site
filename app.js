@@ -233,6 +233,7 @@ const translations = {
         // Products
         productsTitle: "The Loan",
         products: "Products",
+        weOffer: "We Offer",
         termLoan: "Term Loan",
         termLoanDesc: "Get funding in under 24 hours for up to R18.5 million with flexible repayment terms. Terms range from six to 24 months.",
         applyNow: "Apply Now",
@@ -346,6 +347,7 @@ const translations = {
         // Products
         productsTitle: "Die Lening",
         products: "Produkte",
+        weOffer: "Wat Ons Bied",
         termLoan: "Termlening",
         termLoanDesc: "Kry befondsing in minder as 24 uur vir tot R18.5 miljoen met buigsame terugbetalingsterme. Terme wissel van ses tot 24 maande.",
         applyNow: "Doen Nou Aansoek",
