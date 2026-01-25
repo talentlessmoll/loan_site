@@ -417,4 +417,4 @@ export function initAdminUI(SUPABASE_URL, SUPABASE_ANON_KEY) {
     window.addEventListener('beforeunload', () => {
         if (pollInterval) clearInterval(pollInterval);
     });
-              }
+}
