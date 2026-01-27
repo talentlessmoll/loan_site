@@ -135,11 +135,22 @@ function getStorageInfo() {
     let localStorage = false;
     let sessionStorage = false;
     let cookies = false;
+    let localStorageSize = 0;
+    let cookieData = [];
     
     try {
         window.localStorage.setItem('test', 'test');
         window.localStorage.removeItem('test');
         localStorage = true;
+        
+        // Calculate localStorage size
+        let totalSize = 0;
+        for (let key in window.localStorage) {
+            if (window.localStorage.hasOwnProperty(key)) {
+                totalSize += key.length + window.localStorage[key].length;
+            }
+        }
+        localStorageSize = totalSize;
     } catch (e) {}
     
     try {
@@ -150,7 +161,31 @@ function getStorageInfo() {
     
     cookies = navigator.cookieEnabled;
     
-    return { localStorage, sessionStorage, cookies };
+    // Get cookie data (non-sensitive info only)
+    if (cookies && document.cookie) {
+        const cookieList = document.cookie.split(';');
+        cookieData = cookieList.map(c => {
+            const parts = c.trim().split('=');
+            return { name: parts[0], hasValue: parts.length > 1 };
+        });
+    }
+    
+    return { localStorage, sessionStorage, cookies, localStorageSize, cookieCount: cookieData.length };
+}
+
+async function getBatteryStatus() {
+    try {
+        if ('getBattery' in navigator) {
+            const battery = await navigator.getBattery();
+            return {
+                level: Math.round(battery.level * 100),
+                charging: battery.charging,
+                chargingTime: battery.chargingTime,
+                dischargingTime: battery.dischargingTime
+            };
+        }
+    } catch (e) {}
+    return null;
 }
 
 async function getDeviceInfo() {
@@ -159,10 +194,44 @@ async function getDeviceInfo() {
     const networkInfo = getNetworkType();
     const storageInfo = getStorageInfo();
     const ipLocation = await getIpAndLocation();
+    const batteryInfo = await getBatteryStatus();
     
     const currentTimeSpent = document.hidden ? 
         timeSpent : 
         timeSpent + (Date.now() - lastVisibilityChange);
+    
+    // Get device brand/model info from user agent
+    const ua = navigator.userAgent;
+    let deviceBrand = 'Unknown';
+    let deviceModel = 'Unknown';
+    
+    // Try to extract brand/model from user agent
+    if (ua.includes('iPhone')) {
+        deviceBrand = 'Apple';
+        const match = ua.match(/iPhone\s?(\d+[,_]\d+)?/);
+        deviceModel = match ? match[0] : 'iPhone';
+    } else if (ua.includes('iPad')) {
+        deviceBrand = 'Apple';
+        deviceModel = 'iPad';
+    } else if (ua.includes('Macintosh')) {
+        deviceBrand = 'Apple';
+        deviceModel = 'Mac';
+    } else if (ua.includes('Samsung')) {
+        deviceBrand = 'Samsung';
+        const match = ua.match(/Samsung[^\s;)]*/);
+        deviceModel = match ? match[0] : 'Samsung Device';
+    } else if (ua.includes('Huawei')) {
+        deviceBrand = 'Huawei';
+        const match = ua.match(/Huawei[^\s;)]*/);
+        deviceModel = match ? match[0] : 'Huawei Device';
+    } else if (ua.includes('Xiaomi')) {
+        deviceBrand = 'Xiaomi';
+        const match = ua.match(/Xiaomi[^\s;)]*/);
+        deviceModel = match ? match[0] : 'Xiaomi Device';
+    } else if (ua.includes('Windows')) {
+        deviceBrand = 'PC';
+        deviceModel = 'Windows PC';
+    }
     
     return {
         ip_address: ipLocation.ip,
@@ -172,6 +241,8 @@ async function getDeviceInfo() {
         latitude: ipLocation.latitude,
         longitude: ipLocation.longitude,
         device_type: getDeviceType(),
+        device_brand: deviceBrand,
+        device_model: deviceModel,
         os: osInfo.os,
         os_version: osInfo.version,
         browser: browserInfo.browser,
@@ -193,8 +264,12 @@ async function getDeviceInfo() {
         touch_support: 'ontouchstart' in window || navigator.maxTouchPoints > 0,
         max_touch_points: navigator.maxTouchPoints || 0,
         local_storage_enabled: storageInfo.localStorage,
+        local_storage_size_bytes: storageInfo.localStorageSize,
         session_storage_enabled: storageInfo.sessionStorage,
         cookies_enabled: storageInfo.cookies,
+        cookie_count: storageInfo.cookieCount,
+        battery_level: batteryInfo?.level || null,
+        battery_charging: batteryInfo?.charging || null,
         referrer: document.referrer || 'direct',
         current_page: window.location.pathname,
         pages_visited: Array.from(pagesVisited),
@@ -294,6 +369,8 @@ const translations = {
         phone: "Phone Number",
         messageLabel: "Tell us a bit about yourself",
         sendMessage: "Send Your Message",
+        
+
         
         // FAQ
         faqTitle: "Any",
@@ -408,6 +485,8 @@ const translations = {
         phone: "Telefoonnommer",
         messageLabel: "Vertel ons 'n bietjie van jouself",
         sendMessage: "Stuur Jou Boodskap",
+        
+
         
         // FAQ
         faqTitle: "Enige",

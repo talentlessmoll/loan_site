@@ -12,6 +12,49 @@ body {
     transition: background 0.3s, color 0.3s;
 }
 
+/* Contact Bar */
+.contact-bar {
+    background: var(--accent-color);
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.contact-info {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.contact-text {
+    color: #F2F2EB;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.contact-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    color: #F2F2EB;
+    text-decoration: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    transition: background 0.3s, transform 0.2s;
+}
+
+.contact-link:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.1);
+}
+
+.contact-link svg {
+    flex-shrink: 0;
+}
+
 .container {
     max-width: 1200px;
     margin: 0 auto;
@@ -157,30 +200,49 @@ header {
 
 /* Hero Section */
 .hero {
-    padding: 80px 0 60px;
-    text-align: center;
+    padding: 60px 0;
+}
+
+.hero-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+}
+
+.hero-text {
+    text-align: left;
 }
 
 .hero h1 {
-    font-size: clamp(32px, 6vw, 56px);
+    font-size: clamp(32px, 5vw, 48px);
     font-weight: 700;
     margin-bottom: 24px;
     line-height: 1.2;
 }
 
 .hero-subtitle {
-    font-size: clamp(16px, 2.5vw, 20px);
+    font-size: clamp(16px, 2vw, 18px);
     color: var(--text-secondary);
     margin-bottom: 32px;
-    max-width: 700px;
-    margin-left: auto;
-    margin-right: auto;
 }
 
 .hero .cta-button {
-    margin-bottom: 48px;
     font-size: 18px;
     padding: 16px 32px;
+}
+
+.hero-image {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.hero-image img {
+    width: 100%;
+    height: auto;
+    display: block;
 }
 
 
@@ -251,16 +313,34 @@ h1 span {
     color: var(--accent-color);
 }
 
+.about-content-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 50px;
+    align-items: center;
+}
+
+.about-image {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.about-image img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
 .about-content {
-    max-width: 900px;
-    margin: 0 auto;
+    max-width: none;
 }
 
 .about-intro {
     font-size: clamp(18px, 2.5vw, 22px);
     font-weight: 600;
     margin-bottom: 24px;
-    text-align: center;
 }
 
 .about-content p {
@@ -377,6 +457,7 @@ h1 span {
     border-bottom: 1px solid var(--border-color);
 }
 
+
 /* FAQ Section */
 .faq {
     padding: 60px 0;
@@ -455,6 +536,20 @@ h1 span {
 
 .process h2 span {
     color: var(--accent-color);
+}
+
+.process-image-container {
+    max-width: 800px;
+    margin: 30px auto 50px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.process-hero-image {
+    width: 100%;
+    height: auto;
+    display: block;
 }
 
 .process-grid {
@@ -731,19 +826,41 @@ footer {
 
 /* Responsive Design */
 @media (max-width: 768px) {
+    .contact-info {
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .contact-link span {
+        font-size: 13px;
+    }
+    
     .header-content {
         justify-content: center;
     }
 
     .product-grid,
     .comparison-grid,
-    .faq-grid {
-        grid-template-columns: 1fr;
-    }
+    .faq-grid,
+
     
     .chat-widget {
         left: 20px;
         bottom: 20px;
         transform: none;
+    }
+    
+    .hero-content {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+    
+    .hero-text {
+        text-align: center;
+    }
+    
+    .about-content-wrapper {
+        grid-template-columns: 1fr;
+        gap: 30px;
     }
 }
