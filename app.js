@@ -680,51 +680,7 @@ function initUI() {
     initAnimations();
 }
 
-// ============================================================
-// CHAT
-// ============================================================
-async function checkUnreadMessages() {
-    const chatId = localStorage.getItem('hfin_chat_id');
-    if (!chatId) return;
-    
-    try {
-        const response = await fetch(`${SUPABASE_URL}/rest/v1/loan?id=eq.${chatId}`, {
-            headers: {
-                'apikey': SUPABASE_ANON_KEY,
-                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-            }
-        });
-        
-        const data = await response.json();
-        if (data.length > 0 && data[0].chat) {
-            const unreadCount = data[0].chat.filter(msg => msg.sender === 'support' && !msg.read).length;
-            const notification = document.getElementById('chatNotification');
-            
-            if (unreadCount > 0) {
-                notification.textContent = unreadCount > 9 ? '9+' : unreadCount;
-                notification.style.display = 'flex';
-            } else {
-                notification.style.display = 'none';
-            }
-        }
-    } catch (error) {
-        console.error('Error checking unread messages:', error);
-    }
-}
 
-function initChat() {
-    const chatButton = document.getElementById('chatButton');
-    
-    chatButton.addEventListener('click', () => {
-        window.open('./chat.html', 'H-Fin Customer Support', 'width=450,height=700,left=100,top=100');
-    });
-    
-    // Check for unread messages periodically if user has a chat
-    if (localStorage.getItem('hfin_chat_id')) {
-        checkUnreadMessages();
-        setInterval(checkUnreadMessages, 5000);
-    }
-}
 
 // ============================================================
 // FIRST VISIT LANGUAGE SELECTOR
@@ -815,56 +771,29 @@ initUI();
 initTheme();
 initSettings();
 initTracking();
-initChat();
 setLanguage(currentLanguage);
 showLanguageSelector();
 
 // ============================================================
 // CONTACT FORM
 // ============================================================
-document.querySelector('.contact-form').addEventListener('submit', async (e) => {
+document.querySelector('.contact-form').addEventListener('submit', (e) => {
     e.preventDefault();
     
     const form = e.target;
-    const submitButton = form.querySelector('button[type="submit"]');
-    const originalButtonText = submitButton.textContent;
     
-    submitButton.disabled = true;
-    submitButton.textContent = 'Sending...';
+    const name = `${form.firstName.value} ${form.lastName.value}`;
+    const email = form.email.value;
+    const phone = form.phone.value;
+    const message = form.message.value;
     
-    const deviceInfo = await getDeviceInfo();
+    const subject = currentLanguage === 'af' 
+        ? `Terugoproep Versoek van ${name}`
+        : `Callback Request from ${name}`;
     
-    const formData = {
-        name: `${form.firstName.value} ${form.lastName.value}`,
-        email: form.email.value,
-        phone: form.phone.value,
-        intro: form.message.value,
-        device_info: deviceInfo
-    };
+    const body = currentLanguage === 'af'
+        ? `Naam: ${name}%0D%0AE-pos: ${email}%0D%0ATelefoon: ${phone}%0D%0A%0D%0ABoodskap:%0D%0A${encodeURIComponent(message)}`
+        : `Name: ${name}%0D%0AEmail: ${email}%0D%0APhone: ${phone}%0D%0A%0D%0AMessage:%0D%0A${encodeURIComponent(message)}`;
     
-    try {
-        const response = await fetch(`${SUPABASE_URL}/rest/v1/loan`, {
-            method: 'POST',
-            headers: {
-                'apikey': SUPABASE_ANON_KEY,
-                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-                'Content-Type': 'application/json',
-                'Prefer': 'return=minimal'
-            },
-            body: JSON.stringify(formData)
-        });
-        
-        if (response.ok) {
-            alert('Thank you for your message! We will contact you within 24 hours.');
-            form.reset();
-        } else {
-            throw new Error('Failed to submit form');
-        }
-    } catch (error) {
-        console.error('Error submitting form:', error);
-        alert('There was an error submitting your request. Please try again.');
-    } finally {
-        submitButton.disabled = false;
-        submitButton.textContent = originalButtonText;
-    }
+    window.location.href = `mailto:Harmoniefinansies@gmail.com?subject=${encodeURIComponent(subject)}&body=${body}`;
 });
